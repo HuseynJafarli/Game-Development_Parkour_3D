@@ -4,26 +4,52 @@ public class PlayerMovement : MonoBehaviour
 {
     public float moveForce = 15f;
     public float jumpForce = 6f;
+    public float maxVelocity = 10f;
+    public float fallThreshold = -10f;
 
     Rigidbody rb;
     bool isGrounded;
+    float h, v;
+    Vector3 startPosition;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+        startPosition = transform.position;
     }
 
     void Update()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
-        Vector3 direction = new Vector3(h, 0, v);
-        rb.AddForce(direction * moveForce);
+        h = Input.GetAxis("Horizontal");
+        v = Input.GetAxis("Vertical");
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false; 
+        }
+
+        if (transform.position.y < fallThreshold)
+        {
+            TeleportToStart();
+        }
+    }
+
+    void TeleportToStart()
+    {
+        transform.position = startPosition; 
+        rb.linearVelocity = Vector3.zero;        
+        rb.angularVelocity = Vector3.zero; 
+    }
+
+    void FixedUpdate()
+    {
+        Vector3 moveDir = new Vector3(h, 0, v).normalized;
+
+        if (rb.linearVelocity.magnitude < maxVelocity)
+        {
+            rb.AddForce(moveDir * moveForce);
         }
     }
 
