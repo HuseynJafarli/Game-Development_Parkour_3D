@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void TeleportToStart()
+    public void TeleportToStart()
     {
         transform.position = startPosition; 
         rb.linearVelocity = Vector3.zero;        
